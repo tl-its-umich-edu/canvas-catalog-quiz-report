@@ -3,22 +3,7 @@ import time
 import os
 import json
 import logging
-import urllib
 from requests import get
-
-
-# check the progress of quiz report
-# return true if the progress is 100% done
-
-
-def wait_till_quiz_report_is_ready(report_progress_url):
-    report_ready = False
-    while not report_ready:
-        report_status_json = urllib.request.urlopen(report_progress_url).read()
-        percentage = report_status_json["completion"]
-        if percentage == 100:
-            report_ready = True
-    return
 
 
 def main():
@@ -44,6 +29,8 @@ def main():
     TERM_ID = ENV["TERM_ID"]  # only one term, "DEFAULT TERM", for now
     CANVAS_ACCOUNT_ID = ENV["CANVAS_ACCOUNT_ID"]
 
+    # the output folder used in docker image
+    # the local output folder can be mapped to different path in the docker command line
     output_folder = '/tmp/'
 
     # Initialize a new Canvas object
