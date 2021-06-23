@@ -12,7 +12,6 @@ also need to install some or all of the following:
 
 - [Python 3.8](https://docs.python.org/3.8/)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop)
-- [OpenShift CLI](https://docs.openshift.com/enterprise/3.1/cli_reference/get_started_cli.html)
 
 While performing any of the actions described below, use a terminal, text editor, or file
 utility as necessary. Sample terminal commands are provided for some steps.
