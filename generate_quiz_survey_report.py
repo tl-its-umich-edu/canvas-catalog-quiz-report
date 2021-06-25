@@ -35,68 +35,62 @@ def main():
 
     # Initialize a new Canvas object
     canvas = Canvas(API_URL, API_KEY)
-    accounts = canvas.get_accounts()
 
-    # search for all Canvas accounts
-    for account in accounts:
-        subaccounts = account.get_subaccounts()
-        for sa in subaccounts:
-            print(f"account title = {sa.name}; account id = {sa.id}")
-            if sa.id != CANVAS_ACCOUNT_ID:
-                continue
+    # get the account with id equals to CANVAS_ACCOUNT_ID
+    account = canvas.get_account(CANVAS_ACCOUNT_ID)
 
-            # get all courses in CANVAS_ACCOUNT_ID
-            courses = account.get_courses(
-                enrollment_term_id=TERM_ID,
-                published=True
-            )
+    # get all courses in CANVAS_ACCOUNT_ID
+    courses = account.get_courses(
+        enrollment_term_id=TERM_ID,
+        published=True
+    )
 
-            course_count = 0
-            for course in courses:
-                course_count = course_count + 1
-                print(course.name)
+    course_count = 0
+    for course in courses:
+        course_count = course_count + 1
+        print(course.name)
 
-                # use course name and id as directory inside zip file
-                course_output_path = f"{output_folder}{course.name}({course.id})/"
-                os.makedirs(os.path.dirname(
-                    course_output_path), exist_ok=True)
-                users = course.get_users()
+        # use course name and id as directory inside zip file
+        course_output_path = f"{output_folder}{course.id} {course.name}/"
+        os.makedirs(os.path.dirname(
+            course_output_path), exist_ok=True)
+        users = course.get_users()
 
-                # count user number
-                user_number = 0
-                for user in users:
-                    user_number = user_number + 1
-                    break
+        # count user number
+        user_number = 0
+        for user in users:
+            user_number = user_number + 1
+            break
 
-                # proceed only when course has user inside
-                if user_number == 0:
-                    continue
+        # proceed only when course has user inside
+        if user_number == 0:
+            continue
 
-                # get all quizzes inside course
-                quizzes = course.get_quizzes()
-                for quiz in quizzes:
-                    print(
-                        f"""course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type} assignment id = {quiz.assignment_id}""")
+        # get all quizzes inside course
+        quizzes = course.get_quizzes()
+        for quiz in quizzes:
+            print(
+                f"""course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type} assignment id = {quiz.assignment_id}""")
 
-                    # create quiz "student analysis" report
-                    quiz_report = quiz.create_report(
-                        'student_analysis', include=['progress_url', 'file'])
+            # create quiz "student analysis" report
+            quiz_report = quiz.create_report(
+                'student_analysis', include=['progress_url', 'file'])
 
-                    # sleep for 2 sec before downloading the report file
-                    time.sleep(2)
+            # sleep for 2 sec before downloading the report file
+            time.sleep(2)
 
-                    # download the student analysis report
-                    try:
-                        download_url = quiz_report.file['url']
-                        response = get(download_url)
-                        with open(f"{course_output_path}{quiz.title}_Student Analysis.csv", 'wb') as file:
-                            file.write(response.content)
-                    except AttributeError:
-                        print(
-                            f"course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type}: has no attribute file.")
-                    else:
-                        print(
-                            f"course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type}: problem getting quiz report csv file.")
+            # download the student analysis report
+            try:
+                download_url = quiz_report.file['url']
+                response = get(download_url)
+                with open(f"{course_output_path}{quiz.title}_Student Analysis.csv", 'wb') as file:
+                    file.write(response.content)
+            except AttributeError:
+                print(
+                    f"course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type}: has no attribute file.")
+            else:
+                print(
+                    f"course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type}: problem getting quiz report csv file.")
 
 
 if __name__ == "__main__":
