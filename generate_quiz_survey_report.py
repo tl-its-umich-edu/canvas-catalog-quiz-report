@@ -48,15 +48,16 @@ def main():
     course_count = 0
     for course in courses:
         course_count = course_count + 1
-        print(course.name)
-
+        # escape '/' in the course name string
+        course_name = course.name.replace('/', ' ')
+        print(f"course id: {course.id}; course name: {course_name}")
         # use course name and id as directory inside zip file
-        course_output_path = f"{output_folder}{course.id} {course.name}/"
+        course_output_path = f"{output_folder}{course.id} {course_name}/"
         os.makedirs(os.path.dirname(
             course_output_path), exist_ok=True)
-        users = course.get_users()
 
         # count user number
+        users = course.get_users()
         user_number = 0
         for user in users:
             user_number = user_number + 1
