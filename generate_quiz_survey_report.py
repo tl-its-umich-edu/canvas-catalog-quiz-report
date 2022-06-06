@@ -50,11 +50,11 @@ def main():
         course_count = course_count + 1
         # escape '/' in the course name string
         course_name = course.name.replace('/', ' ')
-        print(f"course id: {course.id}; course name: {course_name}")
         # use course name and id as directory inside zip file
         course_output_path = f"{output_folder}{course.id} {course_name}/"
         os.makedirs(os.path.dirname(
             course_output_path), exist_ok=True)
+        print(f"course id: {course.id}; course name: {course_name}; output path: {course_output_path}")
 
         # count user number
         users = course.get_users()
@@ -88,11 +88,10 @@ def main():
                     file.write(response.content)
             except AttributeError:
                 print(
-                    f"course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type}: has no attribute file.")
-            else:
+                    f"Error: course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type}: has no attribute file.")
+            except Exception as e:
                 print(
-                    f"course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type}: problem getting quiz report csv file.")
-
+                    f"Error: course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type}: problem getting quiz report csv file. {e}")
 
 if __name__ == "__main__":
     main()
