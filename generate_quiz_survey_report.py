@@ -4,13 +4,21 @@ import os
 import json
 import logging
 from requests import get
-
+import logging
+import sys
 
 def main():
     """
     Get the configuration file
     """
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger("canvasapi")
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    handler.setLevel(logging.DEBUG)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
     # Set up ENV
     CONFIG_PATH = os.path.join(os.path.dirname(
@@ -19,7 +27,7 @@ def main():
         with open(CONFIG_PATH) as env_file:
             ENV = json.load(env_file)
     except FileNotFoundError:
-        print(
+        logger.error(
             f'Configuration file could not be found; please add file "{CONFIG_PATH}".')
         ENV = dict()
 
@@ -54,7 +62,7 @@ def main():
         course_output_path = f"{output_folder}{course.id} {course_name}/"
         os.makedirs(os.path.dirname(
             course_output_path), exist_ok=True)
-        print(f"course id: {course.id}; course name: {course_name}; output path: {course_output_path}")
+        logger.info(f"course id: {course.id}; course name: {course_name}; output path: {course_output_path}")
 
         # count user number
         users = course.get_users()
@@ -70,7 +78,7 @@ def main():
         # get all quizzes inside course
         quizzes = course.get_quizzes()
         for quiz in quizzes:
-            print(
+            logger.info(
                 f"""course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type} assignment id = {quiz.assignment_id}""")
 
             # create quiz "student analysis" report
@@ -87,10 +95,10 @@ def main():
                 with open(f"{course_output_path}{quiz.title}_Student Analysis.csv", 'wb') as file:
                     file.write(response.content)
             except AttributeError:
-                print(
+                logger.error(
                     f"Error: course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type}: has no attribute file.")
             except Exception as e:
-                print(
+                logger.error(
                     f"Error: course id = {course.id} quiz id={quiz.id} type={quiz.quiz_type}: problem getting quiz report csv file. {e}")
 
 if __name__ == "__main__":
